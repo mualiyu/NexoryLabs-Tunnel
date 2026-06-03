@@ -6,7 +6,8 @@ FRP_VERSION="${FRP_VERSION:-0.69.1}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT="$ROOT/build/frpc"
 
-arch="$(dpkg-architecture -qDEB_BUILD_GNU_CPU)"
+# Debian arch name (amd64, arm64) — not the GNU CPU name (x86_64, aarch64).
+arch="$(dpkg-architecture -qDEB_HOST_ARCH)"
 case "$arch" in
   amd64) frp_arch=amd64 ;;
   arm64) frp_arch=arm64 ;;
