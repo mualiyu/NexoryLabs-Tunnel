@@ -8,6 +8,10 @@ export DH_VERBOSE = 1
 override_dh_auto_build:
 	debian/fetch-frpc.sh
 
+override_dh_install:
+	dh_install
+	mv debian/nexory-tunnel/usr/bin/tunnel.sh debian/nexory-tunnel/usr/bin/nexory-tunnel
+
 override_dh_auto_clean:
 	dh_auto_clean
 	rm -rf build
