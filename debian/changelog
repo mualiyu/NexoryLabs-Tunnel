@@ -1,3 +1,10 @@
+nexory-tunnel (1.0.1) stable; urgency=medium
+
+  * Fix postinst failing on reinstall when the previous version is non-numeric.
+  * Ensure the CLI is installed as /usr/bin/nexory-tunnel (not a directory).
+
+ -- Nexory Labs <admin@nexorylabs.com>  Wed, 04 Jun 2026 12:00:00 +0000
+
 nexory-tunnel (1.0.0) stable; urgency=medium
 
   * Initial release: nexory-tunnel client CLI with bundled frpc.

@@ -103,7 +103,7 @@ Build the package on a Linux machine (needs `debhelper`, `curl`):
 sudo apt install build-essential devscripts debhelper curl
 git clone https://github.com/mualiyu/NexoryLabs-Tunnel.git && cd NexoryLabs-Tunnel
 make deb
-sudo apt install ../nexory-tunnel_1.0.0_amd64.deb
+sudo apt install ../nexory-tunnel_1.0.1_amd64.deb
 ```
 
 On **arm64** (e.g. Raspberry Pi, Graviton), build with `make deb-arm64` instead.
@@ -120,7 +120,7 @@ This installs:
 Or download a pre-built `.deb` from [GitHub Releases](https://github.com/mualiyu/NexoryLabs-Tunnel/releases) and install:
 
 ```bash
-sudo apt install ./nexory-tunnel_1.0.0_amd64.deb
+sudo apt install ./nexory-tunnel_1.0.1_amd64.deb
 ```
 
 ### Option B — run the script directly

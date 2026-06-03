@@ -10,7 +10,9 @@ override_dh_auto_build:
 
 override_dh_install:
 	dh_install
+	test -f debian/nexory-tunnel/usr/bin/tunnel.sh
 	mv debian/nexory-tunnel/usr/bin/tunnel.sh debian/nexory-tunnel/usr/bin/nexory-tunnel
+	chmod 755 debian/nexory-tunnel/usr/bin/nexory-tunnel
 
 override_dh_auto_clean:
 	dh_auto_clean
