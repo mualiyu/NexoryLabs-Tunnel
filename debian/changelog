@@ -1,3 +1,9 @@
+nexory-tunnel (1.0.2) stable; urgency=medium
+
+  * Install CLI directly as /usr/bin/nexory-tunnel instead of renaming via mv.
+
+ -- Nexory Labs <admin@nexorylabs.com>  Wed, 04 Jun 2026 18:00:00 +0000
+
 nexory-tunnel (1.0.1) stable; urgency=medium
 
   * Fix postinst failing on reinstall when the previous version is non-numeric.

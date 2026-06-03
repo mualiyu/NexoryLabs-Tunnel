@@ -1,4 +1,3 @@
-tunnel.sh usr/bin/
 build/frpc usr/lib/nexory-tunnel/
 etc/nexory-tunnel/default etc/nexory-tunnel/
 README.md usr/share/doc/nexory-tunnel/
