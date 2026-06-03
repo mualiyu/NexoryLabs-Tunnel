@@ -15,7 +15,7 @@ Browser ──HTTPS──► Caddy (:443, per-subdomain TLS issued on demand via
 ```
 
 - **Server**: `frps` + `Caddy` on your AWS box `3.12.247.90`.
-- **Client**: `frpc`, driven by the `tunnel.sh` helper, on your laptop.
+- **Client**: `frpc`, driven by the `nexory-tunnel` CLI, on your laptop.
 - **TLS**: Caddy issues a real Let's Encrypt cert for each subdomain the
   first time it's requested, using the **HTTP-01 challenge** (port 80). No DNS
   API, no Route 53 access, no wildcard cert needed. A localhost-only authorizer
@@ -76,7 +76,7 @@ sudo systemctl status frps caddy
 ```
 
 > **Let's Encrypt rate limits:** ~50 certs per registered domain per week, so
-> avoid spinning up endless one-off random subdomains. `tunnel.sh http` defaults
+> avoid spinning up endless one-off random subdomains. `nexory-tunnel http` defaults
 > to a **stable** name (`<hostname>-<port>`) for exactly this reason — reuse
 > names and certs get reused/renewed instead of re-issued.
 
@@ -95,28 +95,68 @@ sudo systemctl status frps caddy
 
 ## Client usage (your laptop)
 
+### Option A — install the `.deb` package (recommended on Ubuntu/Debian)
+
+Build the package on a Linux machine (needs `debhelper`, `curl`):
+
+```bash
+sudo apt install build-essential devscripts debhelper curl
+git clone https://github.com/mualiyu/NexoryLabs-Tunnel.git && cd NexoryLabs-Tunnel
+make deb
+sudo apt install ../nexory-tunnel_1.0.0_amd64.deb
+```
+
+On **arm64** (e.g. Raspberry Pi, Graviton), build with `make deb-arm64` instead.
+
+This installs:
+
+| Path | Purpose |
+| --- | --- |
+| `/usr/bin/nexory-tunnel` | main CLI |
+| `/usr/bin/tunnel` | symlink to `nexory-tunnel` |
+| `/usr/lib/nexory-tunnel/frpc` | bundled frpc (v0.69.1) |
+| `/etc/nexory-tunnel/default` | server defaults (no token) |
+
+Or download a pre-built `.deb` from [GitHub Releases](https://github.com/mualiyu/NexoryLabs-Tunnel/releases) and install:
+
+```bash
+sudo apt install ./nexory-tunnel_1.0.0_amd64.deb
+```
+
+### Option B — run the script directly
+
+```bash
+chmod +x tunnel.sh
+./tunnel.sh login
+./tunnel.sh http 3000
+```
+
+(`frpc` is downloaded on first run into `~/.config/nexory-tunnel/bin`.)
+
+### Commands
+
 One-time login (paste the token from the server output):
 
 ```bash
-./tunnel.sh login
+nexory-tunnel login
 ```
 
 Expose a local web app — gets HTTPS automatically:
 
 ```bash
-./tunnel.sh http 3000              # → https://<random>.tunnel.nexorylabs.com
-./tunnel.sh http 3000 myapp        # → https://myapp.tunnel.nexorylabs.com
+nexory-tunnel http 3000              # → https://<hostname>-3000.tunnel.nexorylabs.com
+nexory-tunnel http 3000 myapp        # → https://myapp.tunnel.nexorylabs.com
 ```
 
 Expose a raw TCP port (SSH, Postgres, game server, …):
 
 ```bash
-./tunnel.sh tcp 22 25022           # → tunnel.nexorylabs.com:25022
-./tunnel.sh tcp 5432               # → auto-assigned port (shown in output/dashboard)
+nexory-tunnel tcp 22 25022           # → tunnel.nexorylabs.com:25022
+nexory-tunnel tcp 5432               # → auto-assigned port (shown in output/dashboard)
 ```
 
-`frpc` is downloaded automatically on first run and cached in
-`~/.config/nexory-tunnel/bin`. Press `Ctrl+C` to close the tunnel.
+Press `Ctrl+C` to close a tunnel. User config (token) lives in
+`~/.config/nexory-tunnel/config`; system defaults in `/etc/nexory-tunnel/default`.
 
 The dashboard (live tunnels, traffic stats) is at `https://tunnel.nexorylabs.com`.
 
@@ -157,4 +197,6 @@ sudo journalctl -u caddy -e
 | File | Runs on | Purpose |
 | --- | --- | --- |
 | `setup-server.sh` | AWS server | install + configure frps & Caddy |
-| `tunnel.sh` | your laptop | download frpc & open tunnels |
+| `tunnel.sh` | your laptop | CLI source (installed as `/usr/bin/nexory-tunnel`) |
+| `debian/` | build host | Debian package metadata |
+| `etc/nexory-tunnel/default` | client (via package) | system-wide server defaults |

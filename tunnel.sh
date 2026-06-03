@@ -1,30 +1,33 @@
 #!/usr/bin/env bash
 #
-# tunnel.sh — expose a local port through your Nexory tunnel server.
+# nexory-tunnel — expose a local port through your Nexory tunnel server.
 #
-# Run this on your LOCAL machine (macOS or Linux). It downloads frpc the first
-# time, then forwards your local service to the public internet.
+# Run on your LOCAL machine (macOS or Linux). When installed via the .deb package,
+# frpc is bundled at /usr/lib/nexory-tunnel/frpc; otherwise it is downloaded on
+# first use into ~/.config/nexory-tunnel/bin.
 #
 # First-time setup (stores server address + token in ~/.config/nexory-tunnel):
-#   ./tunnel.sh login
+#   nexory-tunnel login
 #
 # Expose a local web app (http):
-#   ./tunnel.sh http 3000              # -> https://<random>.tunnel.nexorylabs.com
-#   ./tunnel.sh http 3000 myapp        # -> https://myapp.tunnel.nexorylabs.com
+#   nexory-tunnel http 3000              # -> https://<hostname>-3000.tunnel.nexorylabs.com
+#   nexory-tunnel http 3000 myapp        # -> https://myapp.tunnel.nexorylabs.com
 #
 # Expose a raw TCP port (e.g. SSH, Postgres):
-#   ./tunnel.sh tcp 22                 # -> tunnel.nexorylabs.com:<auto-assigned>
-#   ./tunnel.sh tcp 5432 25432         # -> tunnel.nexorylabs.com:25432
+#   nexory-tunnel tcp 22                 # -> tunnel.nexorylabs.com:<auto-assigned>
+#   nexory-tunnel tcp 5432 25432         # -> tunnel.nexorylabs.com:25432
 #
 # Other:
-#   ./tunnel.sh status                 # show running tunnels (needs admin api)
-#   ./tunnel.sh version
+#   nexory-tunnel version
 #
 set -euo pipefail
 
 # ----------------------------------------------------------------------------
-# Defaults (can be overridden during `login` or via env vars)
+# Paths
 # ----------------------------------------------------------------------------
+SYSTEM_DEFAULT="/etc/nexory-tunnel/default"
+SYSTEM_FRPC="/usr/lib/nexory-tunnel/frpc"
+
 DEFAULT_SERVER="tunnel.nexorylabs.com"
 DEFAULT_PORT="7000"
 DEFAULT_DOMAIN="tunnel.nexorylabs.com"
@@ -32,7 +35,7 @@ DEFAULT_DOMAIN="tunnel.nexorylabs.com"
 CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/nexory-tunnel"
 CONFIG_FILE="$CONFIG_DIR/config"
 CACHE_DIR="$CONFIG_DIR/bin"
-FRPC="$CACHE_DIR/frpc"
+CACHE_FRPC="$CACHE_DIR/frpc"
 
 log()  { printf '\033[1;32m[+]\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[!]\033[0m %s\n' "$*"; }
@@ -57,8 +60,22 @@ detect_arch() {
   esac
 }
 
+frpc_path() {
+  if [ -x "$SYSTEM_FRPC" ]; then
+    printf '%s\n' "$SYSTEM_FRPC"
+  elif [ -x "$CACHE_FRPC" ]; then
+    printf '%s\n' "$CACHE_FRPC"
+  fi
+}
+
 ensure_frpc() {
-  [ -x "$FRPC" ] && return 0
+  local existing
+  existing="$(frpc_path || true)"
+  if [ -n "$existing" ]; then
+    FRPC="$existing"
+    return 0
+  fi
+
   local os arch ver tarball url tmp src
   os="$(detect_os)"; arch="$(detect_arch)"
   ver="${FRP_VERSION:-}"
@@ -76,8 +93,9 @@ ensure_frpc() {
   tar -xzf "$tmp/$tarball" -C "$tmp"
   src="$tmp/frp_${ver}_${os}_${arch}"
   mkdir -p "$CACHE_DIR"
-  install -m 0755 "$src/frpc" "$FRPC"
+  install -m 0755 "$src/frpc" "$CACHE_FRPC"
   rm -rf "$tmp"
+  FRPC="$CACHE_FRPC"
   log "Installed frpc -> $FRPC"
 }
 
@@ -85,6 +103,8 @@ ensure_frpc() {
 # Config
 # ----------------------------------------------------------------------------
 load_config() {
+  # shellcheck disable=SC1090,SC1091
+  [ -f "$SYSTEM_DEFAULT" ] && . "$SYSTEM_DEFAULT"
   # shellcheck disable=SC1090
   [ -f "$CONFIG_FILE" ] && . "$CONFIG_FILE"
   SERVER_ADDR="${SERVER_ADDR:-$DEFAULT_SERVER}"
@@ -111,7 +131,7 @@ EOF
 }
 
 require_token() {
-  [ -n "${TOKEN:-}" ] || die "No auth token configured. Run:  $0 login"
+  [ -n "${TOKEN:-}" ] || die "No auth token configured. Run:  nexory-tunnel login"
 }
 
 # ----------------------------------------------------------------------------
@@ -136,7 +156,7 @@ EOF
 
 cmd_http() {
   local local_port="${1:-}" sub="${2:-}"
-  [ -n "$local_port" ] || die "Usage: $0 http <local_port> [subdomain]"
+  [ -n "$local_port" ] || die "Usage: nexory-tunnel http <local_port> [subdomain]"
   require_token
   if [ -z "$sub" ]; then
     # Stable default (hostname-port) so we don't issue a brand-new TLS cert
@@ -161,7 +181,7 @@ EOF
 
 cmd_tcp() {
   local local_port="${1:-}" remote_port="${2:-}"
-  [ -n "$local_port" ] || die "Usage: $0 tcp <local_port> [remote_port]"
+  [ -n "$local_port" ] || die "Usage: nexory-tunnel tcp <local_port> [remote_port]"
   require_token
   local name remote_line
   name="tcp-${local_port}-$(date +%s)"
@@ -189,7 +209,7 @@ cmd_version() {
 }
 
 usage() {
-  sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'
 }
 
 # ----------------------------------------------------------------------------
@@ -203,7 +223,7 @@ main() {
     tcp)          load_config; cmd_tcp "$@" ;;
     version)      cmd_version ;;
     ""|-h|--help|help) usage ;;
-    *) die "Unknown command: $cmd  (try: $0 --help)" ;;
+    *) die "Unknown command: $cmd  (try: nexory-tunnel --help)" ;;
   esac
 }
 main "$@"

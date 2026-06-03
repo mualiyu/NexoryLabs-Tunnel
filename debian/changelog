@@ -1,0 +1,5 @@
+nexory-tunnel (1.0.0) stable; urgency=medium
+
+  * Initial release: nexory-tunnel client CLI with bundled frpc.
+
+ -- Nexory Labs <admin@nexorylabs.com>  Wed, 04 Jun 2026 00:00:00 +0000

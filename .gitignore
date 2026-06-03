@@ -1,0 +1,19 @@
+# Secrets
+.env
+tunnel.env
+
+# Debian build artifacts
+*.deb
+*.ddeb
+*.changes
+*.buildinfo
+*.dsc
+*.tar.*
+debian/.debhelper/
+debian/files
+debian/nexory-tunnel/
+debian/debhelper-build-stamp
+debian/*.debhelper.log
+
+# Bundled frpc fetched at build time
+build/

@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+  configure)
+    if [ -z "$2" ] || [ "$2" -eq 0 ]; then
+      echo ""
+      echo "nexory-tunnel installed."
+      echo "  Run: nexory-tunnel login"
+      echo "  Then: nexory-tunnel http 3000"
+      echo ""
+    fi
+    ;;
+esac
+
+#DEBHELPER#
+exit 0
