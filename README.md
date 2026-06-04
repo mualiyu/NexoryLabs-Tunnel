@@ -1,8 +1,15 @@
 # NexoryLabs Tunnel Server
 
-Self-hosted tunnel **server** for [NexoryLabs](https://github.com/mualiyu/NexoryLabs-Tunnel) — exposes frp (`frps`) + Caddy on your AWS box so clients can share local ports at `*.tunnel.nexorylabs.com` with automatic HTTPS.
+Monorepo for the NexoryLabs self-hosted tunnel:
 
-> **Client:** use the separate `@nexorylabs/tunnel` npm package (coming soon) or any [frpc](https://github.com/fatedier/frp) client with your server token.
+| Directory | Purpose |
+| --- | --- |
+| `/` (root) | **Server** — `setup-server.sh`, frps + Caddy on AWS |
+| [`nexory-tunnel-client/`](./nexory-tunnel-client) | **Client** — npm CLI (`nexory-tunnel`) |
+
+Self-hosted tunnel **server** — exposes frp (`frps`) + Caddy on your AWS box so clients can share local ports at `*.tunnel.nexorylabs.com` with automatic HTTPS.
+
+> **Client:** [`nexory-tunnel-client/`](./nexory-tunnel-client) — npm CLI (`nexory-tunnel login`, `http`, `tcp`)
 
 ```
 Browser ──HTTPS──► Caddy (:443, per-subdomain TLS via HTTP-01)
@@ -93,7 +100,23 @@ sudo systemctl restart frps caddy
 
 ---
 
-## Client connection (frpc)
+## Client (npm)
+
+Install and use the CLI from [`nexory-tunnel-client/`](./nexory-tunnel-client):
+
+```bash
+cd nexory-tunnel-client
+npm install
+npm link
+nexory-tunnel login
+nexory-tunnel http 3000 myapp    # → https://myapp.tunnel.nexorylabs.com
+```
+
+See [nexory-tunnel-client/README.md](./nexory-tunnel-client/README.md) for full usage.
+
+---
+
+## Client connection (frpc config reference)
 
 Clients need:
 
@@ -137,15 +160,16 @@ sudo journalctl -u caddy -e
 
 ## Repository layout
 
-| File | Purpose |
+| Path | Purpose |
 | --- | --- |
-| `setup-server.sh` | one-shot server installer |
-| `.env.example` | credential template (copy to `.env`) |
-| `README.md` | this document |
+| `setup-server.sh` | server installer |
+| `.env.example` | server credential template |
+| `nexory-tunnel-client/` | npm CLI client |
+| `README.md` | server documentation |
 
 ---
 
 ## Related
 
 - [frp](https://github.com/fatedier/frp) — reverse proxy engine
-- Client CLI — separate npm package (`@nexorylabs/tunnel`, TBD)
+- [nexory-tunnel-client](./nexory-tunnel-client) — Node.js client CLI

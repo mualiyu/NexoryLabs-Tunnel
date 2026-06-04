@@ -1,0 +1,35 @@
+{
+  "name": "nexory-tunnel-client",
+  "version": "1.0.0",
+  "description": "CLI client for the NexoryLabs self-hosted frp tunnel server",
+  "type": "module",
+  "bin": {
+    "nexory-tunnel": "bin/nexory-tunnel.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bin/nexory-tunnel.js"
+  },
+  "keywords": [
+    "tunnel",
+    "frp",
+    "nexory",
+    "reverse-proxy"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mualiyu/NexoryLabs-Tunnel.git",
+    "directory": "nexory-tunnel-client"
+  },
+  "dependencies": {
+    "tar": "^7.4.3"
+  }
+}

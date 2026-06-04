@@ -1,5 +1,6 @@
 .env
 tunnel.env
+node_modules/
 
 # Editor / OS
 .DS_Store
