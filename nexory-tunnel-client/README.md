@@ -1,15 +1,21 @@
-# Nexory Tunnel Client
+# @nexorylabs/tunnel
 
-Node.js CLI for connecting to a [NexoryLabs Tunnel Server](https://github.com/mualiyu/NexoryLabs-Tunnel). Wraps `frpc` to expose local HTTP and TCP ports at `*.tunnel.nexorylabs.com`.
+CLI client for the [NexoryLabs Tunnel Server](https://github.com/mualiyu/NexoryLabs-Tunnel). Wraps `frpc` to expose local HTTP and TCP ports at `*.tunnel.nexorylabs.com`.
 
 ## Requirements
 
 - Node.js 18+
-- Auth token from your tunnel server (`/etc/frp/tunnel-credentials.txt`)
+- Auth token from your tunnel server Dashboard at (https://tunnel.nexorylabs.com)
 
 ## Install
 
-From this monorepo:
+From npm (recommended):
+
+```bash
+npm install -g @nexorylabs/tunnel
+```
+
+From this monorepo (development):
 
 ```bash
 cd nexory-tunnel-client
@@ -17,17 +23,10 @@ npm install
 npm link          # optional: global `nexory-tunnel` command
 ```
 
-Or install from git (once published):
+From git:
 
 ```bash
-npm install -g git+https://github.com/mualiyu/NexoryLabs-Tunnel.git#nexory-tunnel-client
-```
-
-Local development without linking:
-
-```bash
-node bin/nexory-tunnel.js login
-node bin/nexory-tunnel.js http 3000
+npm install -g "github:mualiyu/NexoryLabs-Tunnel#main:nexory-tunnel-client"
 ```
 
 ## Usage
@@ -50,3 +49,16 @@ Press `Ctrl+C` to stop a tunnel.
 | --- | --- | --- |
 | `FRP_VERSION` | `0.69.1` | frp release to download |
 | `XDG_CONFIG_HOME` | `~/.config` | config base directory |
+
+## Publish (maintainers)
+
+1. Create the `@nexorylabs` org on [npmjs.com](https://www.npmjs.com/org/create) (if it does not exist).
+2. `npm login` with an account that can publish to `@nexorylabs`.
+3. From this directory:
+
+```bash
+npm version patch   # or minor / major
+npm publish
+```
+
+Or tag a GitHub Release — CI publishes automatically (see `.github/workflows/publish-npm.yml`).

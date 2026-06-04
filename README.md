@@ -5,11 +5,11 @@ Monorepo for the NexoryLabs self-hosted tunnel:
 | Directory | Purpose |
 | --- | --- |
 | `/` (root) | **Server** — `setup-server.sh`, frps + Caddy on AWS |
-| [`nexory-tunnel-client/`](./nexory-tunnel-client) | **Client** — npm CLI (`nexory-tunnel`) |
+| [`nexory-tunnel-client/`](./nexory-tunnel-client) | **Client** — npm package [`@nexorylabs/tunnel`](https://www.npmjs.com/package/@nexorylabs/tunnel) |
 
 Self-hosted tunnel **server** — exposes frp (`frps`) + Caddy on your AWS box so clients can share local ports at `*.tunnel.nexorylabs.com` with automatic HTTPS.
 
-> **Client:** [`nexory-tunnel-client/`](./nexory-tunnel-client) — npm CLI (`nexory-tunnel login`, `http`, `tcp`)
+> **Client:** [`@nexorylabs/tunnel`](https://www.npmjs.com/package/@nexorylabs/tunnel) — `npm install -g @nexorylabs/tunnel`
 
 ```
 Browser ──HTTPS──► Caddy (:443, per-subdomain TLS via HTTP-01)
@@ -102,17 +102,15 @@ sudo systemctl restart frps caddy
 
 ## Client (npm)
 
-Install and use the CLI from [`nexory-tunnel-client/`](./nexory-tunnel-client):
+Install the CLI globally:
 
 ```bash
-cd nexory-tunnel-client
-npm install
-npm link
+npm install -g @nexorylabs/tunnel
 nexory-tunnel login
 nexory-tunnel http 3000 myapp    # → https://myapp.tunnel.nexorylabs.com
 ```
 
-See [nexory-tunnel-client/README.md](./nexory-tunnel-client/README.md) for full usage.
+For local development, see [`nexory-tunnel-client/`](./nexory-tunnel-client) and [nexory-tunnel-client/README.md](./nexory-tunnel-client/README.md).
 
 ---
 
@@ -164,7 +162,7 @@ sudo journalctl -u caddy -e
 | --- | --- |
 | `setup-server.sh` | server installer |
 | `.env.example` | server credential template |
-| `nexory-tunnel-client/` | npm CLI client |
+| `nexory-tunnel-client/` | `@nexorylabs/tunnel` npm package source |
 | `README.md` | server documentation |
 
 ---
@@ -172,4 +170,4 @@ sudo journalctl -u caddy -e
 ## Related
 
 - [frp](https://github.com/fatedier/frp) — reverse proxy engine
-- [nexory-tunnel-client](./nexory-tunnel-client) — Node.js client CLI
+- [`@nexorylabs/tunnel`](https://www.npmjs.com/package/@nexorylabs/tunnel) — npm client CLI
