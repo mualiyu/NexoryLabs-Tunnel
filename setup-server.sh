@@ -18,9 +18,12 @@
 # subdomain is requested.
 #
 # Usage:
+#   cp .env.example .env   # edit with your credentials
 #   sudo ./setup-server.sh
 #
-# Optional environment overrides (sensible defaults below):
+# Optional environment overrides (sensible defaults below).
+# Values in .env (same directory as this script) are loaded automatically.
+#
 #   DOMAIN=tunnel.nexorylabs.com
 #   ACME_EMAIL=you@example.com
 #   FRP_VERSION=0.69.1            # pin a version; empty = latest
@@ -31,6 +34,15 @@
 #   DASHBOARD_PASS=...            # auto-generated if unset
 #
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="${ENV_FILE:-$SCRIPT_DIR/.env}"
+if [ -f "$ENV_FILE" ]; then
+  set -a
+  # shellcheck disable=SC1090,SC1091
+  . "$ENV_FILE"
+  set +a
+fi
 
 # ----------------------------------------------------------------------------
 # Configuration

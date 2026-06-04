@@ -1,4 +1,0 @@
-# System defaults for nexory-tunnel (no secrets — set token via `nexory-tunnel login`).
-DEFAULT_SERVER="tunnel.nexorylabs.com"
-DEFAULT_PORT="7000"
-DEFAULT_DOMAIN="tunnel.nexorylabs.com"
